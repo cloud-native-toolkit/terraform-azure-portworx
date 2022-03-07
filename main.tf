@@ -66,7 +66,7 @@ export KUBECONFIG=${var.cluster_config_file}:$KUBECONFIG
 
 pwd
 chmod +x portworx-prereq.sh
-bash portworx-prereq.sh ${self.triggers.region}
+bash portworx-prereq.sh ${self.triggers.region} || { echo 'portworx-prereq.sh failed' ; exit 1; }
 
 cat ${self.triggers.installer_workspace}/portworx_operator.yaml
 oc apply -f ${self.triggers.installer_workspace}/portworx_operator.yaml
@@ -99,6 +99,8 @@ echo '${self.triggers.kubeconfig}' > .kubeconfig
 #│ n kube-system
 #
 #curl -fsL https://install.portworx.com/px-wipe | bash -s -- -f
+
+#todo: delete azure role definition, service principle
 
 kubectl delete storagecluster ${self.triggers.px_cluster_id} -n kube-system
 
