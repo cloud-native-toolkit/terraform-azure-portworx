@@ -74,3 +74,8 @@ variable "px_enable_csi" {
   description = "Enable CSI on PX"
 }
 
+variable "cluster_config_file" {
+  type        = string
+  description = "Cluster config file for Kubernetes cluster."
+}
+
