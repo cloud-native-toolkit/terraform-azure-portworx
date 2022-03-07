@@ -81,6 +81,12 @@ resource "null_resource" "portworx_cleanup_helper" {
     region              = var.region
     kubeconfig          = var.cluster_config_file
     px_cluster_id       = local.px_cluster_id
+    SUBSCRIPTION_ID = base64encode(var.azure_subscription_id)
+    CLUSTER_NAME = var.cluster_name
+    RESOURCE_GROUP_NAME = var.resource_group_name
+    CLIENT_ID = var.azure_client_id
+    CLIENT_SECRET = base64encode(var.azure_client_secret)
+    TENANT = var.azure_tenant_id
   }
 
   provisioner "local-exec" {
@@ -93,12 +99,12 @@ resource "null_resource" "portworx_cleanup_helper" {
 
     interpreter = ["/bin/bash", "-c"]
     environment = {
-      SUBSCRIPTION_ID = var.azure_subscription_id
-      CLUSTER_NAME = var.cluster_name
-      RESOURCE_GROUP_NAME = var.resource_group_name
-      CLIENT_ID = var.azure_client_id
-      CLIENT_SECRET = var.azure_client_secret
-      TENANT = var.azure_tenant_id
+      SUBSCRIPTION_ID = base64decode(self.triggers.SUBSCRIPTION_ID)
+      CLUSTER_NAME = self.triggers.CLUSTER_NAME
+      RESOURCE_GROUP_NAME = self.triggers.RESOURCE_GROUP_NAME
+      CLIENT_ID = self.triggers.CLIENT_ID
+      CLIENT_SECRET = base64decode(self.triggers.CLIENT_SECRET)
+      TENANT = self.triggers.TENANT
     }
     command     = <<EOF
 echo '${self.triggers.kubeconfig}' > .kubeconfig
