@@ -1,0 +1,9 @@
+name: azure-portworx
+type: terraform
+description: Module to provision portworx on azure
+tags:
+  - tools
+  - devops
+versions: []
+cloudProvider: azure
+id: github.com/cloud-native-toolkit/terraform-azure-portworx
