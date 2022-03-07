@@ -28,7 +28,7 @@ az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
 az account set --subscription $SUBSCRIPTION_ID
 
 
-ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n $CLUSTER_NAME)
+ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n "portworx-$CLUSTER_NAME")
 if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
     echo "Role portworx-$CLUSTER_NAME already exists"
     exit 1
