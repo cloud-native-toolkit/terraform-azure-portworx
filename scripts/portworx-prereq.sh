@@ -1,13 +1,7 @@
 #!/bin/bash
 
-echo "Azure account setup logic goes here"
 
-
-SUBSCRIPTION_ID="bc1627c6-ec80-4da3-8d18-03e91330e2f1"
-CLUSTER_NAME="toolkit-dev-aro"
-RESOURCE_GROUP_NAME="aro-toolkit-dev"
-
-#  az login
+az login --service-principal -u CLIENT_ID -p CLIENT_SECRET --tenant TENANT
 
 az account set -–subscription $SUBSCRIPTION_ID
 

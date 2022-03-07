@@ -16,6 +16,9 @@ module "portworx" {
   azure_client_id       = var.azure_client_id
   azure_client_secret   = var.azure_client_secret
   azure_subscription_id = var.azure_subscription_id
+  azure_tenant_id       = var.azure_tenant_id
+  cluster_name          = var.cluster_name
   cluster_config_file   = module.dev_cluster.platform.kubeconfig
   portworx_config       = local.portworx_config
+  resource_group_name   = var.resource_group_name
 }

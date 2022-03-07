@@ -92,6 +92,14 @@ resource "null_resource" "portworx_cleanup_helper" {
     when = destroy
 
     interpreter = ["/bin/bash", "-c"]
+    environment = {
+      SUBSCRIPTION_ID = var.azure_subscription_id
+      CLUSTER_NAME = var.cluster_name
+      RESOURCE_GROUP_NAME = var.resource_group_name
+      CLIENT_ID = var.azure_client_id
+      CLIENT_SECRET = var.azure_client_secret
+      TENANT = var.azure_tenant_id
+    }
     command     = <<EOF
 echo '${self.triggers.kubeconfig}' > .kubeconfig
 

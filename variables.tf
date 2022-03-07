@@ -18,9 +18,24 @@ variable "azure_client_secret" {
   default = ""
 }
 
+variable "azure_tenant_id" {
+  type    = string
+  default = ""
+}
+
+variable cluster_name {
+  type        = string
+  description = "The name of the ARO cluster"
+}
+
 variable "region" {
   type        = string
   description = "Azure Region the cluster is deployed in"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "Resource group where AWS cluster is deployed"
 }
 
 
