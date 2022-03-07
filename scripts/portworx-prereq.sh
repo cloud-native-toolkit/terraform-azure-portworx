@@ -2,9 +2,37 @@
 
 set -e
 
+if [ -z "$CLIENT_ID" ]; then
+      echo "\$CLIENT_ID is required"
+      exit 1
+fi
+if [ -z "$CLIENT_SECRET" ]; then
+      echo "\$CLIENT_SECRET is required"
+      exit 1
+fi
+if [ -z "$TENANT" ]; then
+      echo "\$TENANT is required"
+      exit 1
+fi
+if [ -z "$SUBSCRIPTION_ID" ]; then
+      echo "\$SUBSCRIPTION_ID is required"
+      exit 1
+fi
+if [ -z "RESOURCE_GROUP_NAME" ]; then
+      echo "\RESOURCE_GROUP_NAME is required"
+      exit 1
+fi
+
 az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
 
 az account set --subscription $SUBSCRIPTION_ID
+
+
+ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n $CLUSTER_NAME)
+if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
+    echo "Role portworx-$CLUSTER_NAME already exists"
+    exit 1
+fi
 
 ROLE=$(az role definition create --role-definition '{
         "Name": "portworx-'$CLUSTER_NAME'",
