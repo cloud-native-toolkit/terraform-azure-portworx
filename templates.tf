@@ -14,9 +14,7 @@ spec:
     internal: true
   cloudStorage:
     deviceSpecs:
-#%{if var.cloud_provider == "aws"}
-#    - type=gp2,size=${var.disk_size},enc=true,kms=${aws_kms_key.px_key[0].key_id}
-#%{endif}
+
 %{if var.cloud_provider == "azure"}
     - type=Premium_LRS,size=${var.kvdb_disk_size}
 %{endif}
@@ -39,17 +37,7 @@ spec:
     CSI: "true"%{endif}
   deleteStrategy:
     type: UninstallAndWipe
-#%{if var.cloud_provider == "aws"}
-#  env:
-#  - name: "AWS_ACCESS_KEY_ID"
-#    value: "${var.access_key}"
-#  - name: "AWS_SECRET_ACCESS_KEY"
-#    value: "${var.secret_key}"
-#  - name: "AWS_CMK"
-#    value: "${aws_kms_key.px_key[0].key_id}"
-#  - name: "AWS_REGION"
-#    value: "${var.region}"
-#%{endif}
+
 %{if !local.px_enterprise}
 ---
 apiVersion: v1
