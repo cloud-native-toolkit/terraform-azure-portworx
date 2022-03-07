@@ -130,6 +130,7 @@ kubectl delete ClusterRoleBinding portworx-operator -n kube-system
 kubectl delete ClusterRole portworx-operator -n kube-system
 kubectl delete PodSecurityPolicy portworx-operator -n kube-system
 kubectl delete ServiceAccount portworx-operator -n kube-system
+kubectl delete Secret px-azure -n kube-system
 
 kubectl get sc | grep portworx | awk '{print $1}' | while read -r SC; do
   kubectl delete storageclass $SC
