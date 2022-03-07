@@ -30,16 +30,34 @@ resource "local_file" "portworx_storagecluster_yaml" {
 resource "null_resource" "install_portworx" {
   count = var.provision ? 1 : 0
 
+  depends_on = [
+    local_file.portworx_operator_yaml,
+    local_file.storage_classes_yaml,
+    local_file.portworx_storagecluster_yaml
+  ]
+
   triggers = {
     installer_workspace = local.installer_workspace
     region              = var.region
+    kubeconfig          = var.cluster_config_file
+    px_cluster_id       = local.px_cluster_id
+    SUBSCRIPTION_ID = base64encode(var.azure_subscription_id)
+    CLUSTER_NAME = var.cluster_name
+    RESOURCE_GROUP_NAME = var.resource_group_name
+    CLIENT_ID = var.azure_client_id
+    CLIENT_SECRET = base64encode(var.azure_client_secret)
+    TENANT = var.azure_tenant_id
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/scripts/"
     when        = create
     environment = {
-#      AWS_ACCESS_KEY_ID = var.access_key
-#      AWS_SECRET_ACCESS_KEY = var.secret_key
+      SUBSCRIPTION_ID = base64decode(self.triggers.SUBSCRIPTION_ID)
+      CLUSTER_NAME = self.triggers.CLUSTER_NAME
+      RESOURCE_GROUP_NAME = self.triggers.RESOURCE_GROUP_NAME
+      CLIENT_ID = self.triggers.CLIENT_ID
+      CLIENT_SECRET = base64decode(self.triggers.CLIENT_SECRET)
+      TENANT = self.triggers.TENANT
     }
     command     = <<EOF
 
@@ -60,38 +78,6 @@ sleep 300
 echo "Create storage classes"
 oc apply -f ${self.triggers.installer_workspace}/storage_classes.yaml
 EOF
-  }
-
-  depends_on = [
-    local_file.portworx_operator_yaml,
-    local_file.storage_classes_yaml,
-    local_file.portworx_storagecluster_yaml,
-    null_resource.portworx_cleanup_helper
-  ]
-}
-
-# This cleanup script will execute **after** the resources have been reclaimed b/c
-# install_portworx depend on it.  At apply-time it doesn't do anything.
-# At destroy-time it will cleanup Portworx artifacts left in the kube cluster.
-resource "null_resource" "portworx_cleanup_helper" {
-  count = var.provision ? 1 : 0
-
-  triggers = {
-    installer_workspace = local.installer_workspace
-    region              = var.region
-    kubeconfig          = var.cluster_config_file
-    px_cluster_id       = local.px_cluster_id
-    SUBSCRIPTION_ID = base64encode(var.azure_subscription_id)
-    CLUSTER_NAME = var.cluster_name
-    RESOURCE_GROUP_NAME = var.resource_group_name
-    CLIENT_ID = var.azure_client_id
-    CLIENT_SECRET = base64encode(var.azure_client_secret)
-    TENANT = var.azure_tenant_id
-  }
-
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = "echo \"cleanup helper ready\""
   }
 
   provisioner "local-exec" {
