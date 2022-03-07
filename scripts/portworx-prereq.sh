@@ -24,9 +24,7 @@ if [ -z "RESOURCE_GROUP_NAME" ]; then
 fi
 
 az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
-
 az account set --subscription $SUBSCRIPTION_ID
-
 
 ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n "portworx-$CLUSTER_NAME")
 if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
@@ -34,6 +32,7 @@ if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
     exit 1
 fi
 
+echo "creating role portworx-$CLUSTER_NAME"
 ROLE=$(az role definition create --role-definition '{
         "Name": "portworx-'$CLUSTER_NAME'",
         "Description": "",
@@ -60,12 +59,14 @@ ROLE=$(az role definition create --role-definition '{
 }')
 
 
+echo "creating service principal portworx-$CLUSTER_NAME"
 SP=$(az ad sp create-for-rbac --role=portworx-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
 
 TENANT=$(echo $SP | jq '.tenant')
 APP_ID=$(echo $SP | jq '.appId')
 PASS=$(echo $SP | jq '.password')
 
+echo "creating kube secret"
 kubectl create secret generic -n kube-system px-azure --from-literal=AZURE_TENANT_ID=$TENANT \
                                                       --from-literal=AZURE_CLIENT_ID=$APP_ID \
                                                       --from-literal=AZURE_CLIENT_SECRET=$PASS
