@@ -15,9 +15,7 @@ spec:
   cloudStorage:
     deviceSpecs:
 
-%{if var.cloud_provider == "azure"}
     - type=Premium_LRS,size=${var.kvdb_disk_size}
-%{endif}
     kvdbDeviceSpec: type=gp2,size=${var.kvdb_disk_size}
   secretsProvider: ${local.secret_provider}
   stork:
