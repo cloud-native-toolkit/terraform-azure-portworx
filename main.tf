@@ -93,7 +93,8 @@ EOF
       TENANT = self.triggers.TENANT
     }
     command     = <<EOF
-echo '${self.triggers.kubeconfig}' > .kubeconfig
+echo '${var.cluster_config_file}' > .kubeconfig
+export KUBECONFIG=${var.cluster_config_file}:$KUBECONFIG
 
 #kubectl label daemonset/portworx-api name=portworx-api -
 #│ n kube-system
