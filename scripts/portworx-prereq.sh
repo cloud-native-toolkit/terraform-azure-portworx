@@ -23,50 +23,54 @@ if [ -z "RESOURCE_GROUP_NAME" ]; then
       exit 1
 fi
 
-az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
-az account set --subscription $SUBSCRIPTION_ID
+#az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
+#az account set --subscription $SUBSCRIPTION_ID
 
-ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n "portworx-$CLUSTER_NAME")
-if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
-    echo "Role portworx-$CLUSTER_NAME already exists"
-    exit 1
-fi
+#ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n "portworx-$CLUSTER_NAME")
+#if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
+#    echo "Role portworx-$CLUSTER_NAME already exists"
+#    exit 1
+#fi
+#
+#echo "creating role portworx-$CLUSTER_NAME"
+#ROLE=$(az role definition create --role-definition '{
+#        "Name": "portworx-'$CLUSTER_NAME'",
+#        "Description": "",
+#        "AssignableScopes": [
+#            "/subscriptions/'$SUBSCRIPTION_ID'"
+#        ],
+#        "Permissions": [
+#            {
+#                "Actions": [
+#                    "Microsoft.ContainerService/managedClusters/agentPools/read",
+#                    "Microsoft.Compute/disks/delete",
+#                    "Microsoft.Compute/disks/write",
+#                    "Microsoft.Compute/disks/read",
+#                    "Microsoft.Compute/virtualMachines/write",
+#                    "Microsoft.Compute/virtualMachines/read",
+#                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/write",
+#                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read"
+#                ],
+#                "NotActions": [],
+#                "DataActions": [],
+#                "NotDataActions": []
+#            }
+#        ]
+#}')
+#
+#
+#echo "creating service principal portworx-$CLUSTER_NAME"
+#SP=$(az ad sp create-for-rbac --role=portworx-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
+#
+#TENANT=$(echo $SP | jq '.tenant')
+#APP_ID=$(echo $SP | jq '.appId')
+#PASS=$(echo $SP | jq '.password')
 
-echo "creating role portworx-$CLUSTER_NAME"
-ROLE=$(az role definition create --role-definition '{
-        "Name": "portworx-'$CLUSTER_NAME'",
-        "Description": "",
-        "AssignableScopes": [
-            "/subscriptions/'$SUBSCRIPTION_ID'"
-        ],
-        "Permissions": [
-            {
-                "Actions": [
-                    "Microsoft.ContainerService/managedClusters/agentPools/read",
-                    "Microsoft.Compute/disks/delete",
-                    "Microsoft.Compute/disks/write",
-                    "Microsoft.Compute/disks/read",
-                    "Microsoft.Compute/virtualMachines/write",
-                    "Microsoft.Compute/virtualMachines/read",
-                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/write",
-                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read"
-                ],
-                "NotActions": [],
-                "DataActions": [],
-                "NotDataActions": []
-            }
-        ]
-}')
-
-
-echo "creating service principal portworx-$CLUSTER_NAME"
-SP=$(az ad sp create-for-rbac --role=portworx-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
-
-TENANT=$(echo $SP | jq '.tenant')
-APP_ID=$(echo $SP | jq '.appId')
-PASS=$(echo $SP | jq '.password')
-
+#echo "creating kube secret"
+#kubectl create secret generic -n kube-system px-azure --from-literal=AZURE_TENANT_ID=$TENANT \
+#                                                      --from-literal=AZURE_CLIENT_ID=$APP_ID \
+#                                                      --from-literal=AZURE_CLIENT_SECRET=$PASS
 echo "creating kube secret"
 kubectl create secret generic -n kube-system px-azure --from-literal=AZURE_TENANT_ID=$TENANT \
-                                                      --from-literal=AZURE_CLIENT_ID=$APP_ID \
-                                                      --from-literal=AZURE_CLIENT_SECRET=$PASS
+                                                      --from-literal=AZURE_CLIENT_ID=$CLIENT_ID \
+                                                      --from-literal=AZURE_CLIENT_SECRET=$CLIENT_SECRET
