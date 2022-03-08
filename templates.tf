@@ -8,7 +8,7 @@ metadata:
   annotations:%{if !local.px_enterprise }${indent(4, "\nportworx.io/misc-args: \"--oem esse\"")}%{endif}
     portworx.io/is-openshift: "true"
 spec:
-  image: portworx/oci-monitor:2.7.0
+  image: portworx/oci-monitor:2.8.1.5
   imagePullPolicy: Always
   kvdb:
     internal: true

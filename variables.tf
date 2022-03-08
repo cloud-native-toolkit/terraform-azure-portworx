@@ -74,7 +74,7 @@ variable "disk_size" {
 }
 
 variable "kvdb_disk_size" {
-  default = 450
+  default = 150
 }
 
 variable "px_enable_monitoring" {
