@@ -15,7 +15,7 @@ spec:
   cloudStorage:
     deviceSpecs:
 
-    - type=Premium_LRS,size=${var.kvdb_disk_size}
+    - type=Premium_LRS,size=${var.disk_size}
     kvdbDeviceSpec: type=gp2,size=${var.kvdb_disk_size}
   secretsProvider: ${local.secret_provider}
   stork:
@@ -35,7 +35,22 @@ spec:
     CSI: "true"%{endif}
   deleteStrategy:
     type: UninstallAndWipe
-
+  env:
+    - name: AZURE_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: px-azure
+          key: AZURE_CLIENT_ID
+    - name: AZURE_TENANT_ID
+      valueFrom:
+        secretKeyRef:
+          name: px-azure
+          key: AZURE_TENANT_ID
+    - name: AZURE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: px-azure
+          key: AZURE_CLIENT_SECRET
 %{if !local.px_enterprise}
 ---
 apiVersion: v1
