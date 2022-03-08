@@ -98,7 +98,7 @@ echo '${self.triggers.kubeconfig}' > .kubeconfig
 #kubectl label daemonset/portworx-api name=portworx-api -
 #│ n kube-system
 #
-#curl -fsL https://install.portworx.com/px-wipe | bash -s -- -f
+curl -fsL https://install.portworx.com/px-wipe | bash -s -- -f
 
 #todo: delete azure role definition, service principle
 
