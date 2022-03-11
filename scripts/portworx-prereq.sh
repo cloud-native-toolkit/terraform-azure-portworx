@@ -39,6 +39,7 @@ if [ "$CLUSTER_TYPE" = "ARO" ]; then
   echo "Preparing Portworx for ARO cluster"
 
   RESOURCE_GROUP_ID=$(az aro show --name $CLUSTER_NAME -g $RESOURCE_GROUP_NAME | jq -r '.clusterProfile.resourceGroupId')
+echo "RESOURCE_GROUP_ID: $RESOURCE_GROUP_ID"
   RESOURCE_GROUP_ID=$(echo $RESOURCE_GROUP_ID | awk -F / '{print $NF}')
   APP_ID=$(az ad sp list --display-name $RESOURCE_GROUP_ID | jq -r '.[].appId')
 
