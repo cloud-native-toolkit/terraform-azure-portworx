@@ -29,10 +29,10 @@ fi
 
 CREDENTIALS=""
 
-#az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
-#az account set --subscription $SUBSCRIPTION_ID
+az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
+az account set --subscription $SUBSCRIPTION_ID
 
-if [ "$CLUSTER_TYPE" = "ARO"]; then
+if [ "$CLUSTER_TYPE" = "ARO" ]; then
   echo "Preparing Portworx for ARO cluster"
 
   RESOURCE_GROUP_ID=$(az aro show --name $CLUSTER_NAME -g $RESOURCE_GROUP_NAME | jq -r '.clusterProfile.resourceGroupId')
