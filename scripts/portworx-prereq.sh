@@ -27,6 +27,9 @@ if [ -z "$CLUSTER_NAME" ]; then
       exit 1
 fi
 
+echo "CLUSTER_NAME: $CLUSTER_NAME"
+echo "RESOURCE_GROUP_NAME: $RESOURCE_GROUP_NAME"
+
 CREDENTIALS=""
 
 az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT
@@ -38,6 +41,12 @@ if [ "$CLUSTER_TYPE" = "ARO" ]; then
   RESOURCE_GROUP_ID=$(az aro show --name $CLUSTER_NAME -g $RESOURCE_GROUP_NAME | jq -r '.clusterProfile.resourceGroupId')
   RESOURCE_GROUP_ID=$(echo $RESOURCE_GROUP_ID | awk -F / '{print $NF}')
   APP_ID=$(az ad sp list --display-name $RESOURCE_GROUP_ID | jq -r '.[].appId')
+
+
+echo "CLUSTER_NAME: $CLUSTER_NAME"
+echo "RESOURCE_GROUP_NAME: $RESOURCE_GROUP_NAME"
+echo "RESOURCE_GROUP_ID: $RESOURCE_GROUP_ID"
+echo "APP_ID: $APP_ID"
   CREDENTIALS=$(az ad app credential reset --id $APP_ID --append)
 
 else
