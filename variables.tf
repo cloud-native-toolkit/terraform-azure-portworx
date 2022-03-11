@@ -35,7 +35,7 @@ variable "region" {
 
 variable "resource_group_name" {
   type        = string
-  description = "Resource group where AWS cluster is deployed"
+  description = "Resource group where cluster is deployed"
 }
 
 
@@ -64,6 +64,16 @@ variable "portworx_config" {
   validation {
     condition     = var.portworx_config.type == "enterprise" || (var.portworx_config.type == "essentials" && length(var.portworx_config.osb_endpoint) > 0)
     error_message = "Variable portworx_config.osb_endpoint value is required for type \"essentials\"."
+  }
+}
+
+variable "cluster_type" {
+  type        = string
+  description = "Type of OCP cluster on Azure (ARO | IPI)"
+  default     = "ARO"
+  validation {
+    condition     = contains(["ARO","IPI"], var.cluster_type)
+    error_message = "Allowed values for cluster_type are \"ARO\" or \"IPI\"."
   }
 }
 

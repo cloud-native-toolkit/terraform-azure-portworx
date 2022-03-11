@@ -47,6 +47,7 @@ resource "null_resource" "install_portworx" {
     CLIENT_ID = var.azure_client_id
     CLIENT_SECRET = base64encode(var.azure_client_secret)
     TENANT = var.azure_tenant_id
+    CLUSTER_TYPE = var.cluster_type
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/scripts/"
@@ -58,6 +59,7 @@ resource "null_resource" "install_portworx" {
       CLIENT_ID = self.triggers.CLIENT_ID
       CLIENT_SECRET = base64decode(self.triggers.CLIENT_SECRET)
       TENANT = self.triggers.TENANT
+      CLUSTER_TYPE = self.triggers.CLUSTER_TYPE
     }
     command     = <<EOF
 

@@ -14,9 +14,9 @@ spec:
     internal: true
   cloudStorage:
     deviceSpecs:
-
     - type=Premium_LRS,size=${var.disk_size}
     kvdbDeviceSpec: type=gp2,size=${var.kvdb_disk_size}
+    journalDeviceSpec: auto
   secretsProvider: ${local.secret_provider}
   stork:
     enabled: true
