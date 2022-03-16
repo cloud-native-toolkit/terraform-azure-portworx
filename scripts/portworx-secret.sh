@@ -16,6 +16,7 @@ APP_ID=$(echo $CREDENTIALS | jq '.appId')
 PASS=$(echo $CREDENTIALS | jq '.password')
 
 echo "creating kube secret"
+kubectl delete secret generic -n kube-system px-azure --ignore-not-found=true
 kubectl create secret generic -n kube-system px-azure --from-literal=AZURE_TENANT_ID=$TENANT \
                                                       --from-literal=AZURE_CLIENT_ID=$CLIENT_ID \
                                                       --from-literal=AZURE_CLIENT_SECRET=$CLIENT_SECRET
