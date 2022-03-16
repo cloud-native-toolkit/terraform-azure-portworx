@@ -46,23 +46,23 @@ jobs:
           TF_VAR_cluster_username: ${{ secrets.AZURE_CLUSTER_USERNAME }}
           TF_VAR_cluster_password: ${{ secrets.AZURE_CLUSTER_PASSWORD }}
 
-#      - name: Verify destroy on ${{ matrix.testcase }}
-#        uses: cloud-native-toolkit/action-module-verify-destroy@main
-#        if: ${{ always() }}
-#        with:
-#          clusterId: ${{ matrix.testcase }}
-#        env:
-#          TF_VAR_: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#          TF_VAR_ibmcloud_api_key: ${{ secrets.IBMCLOUD_API_KEY }}
-#          IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
-#
-#          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-#          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-#          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-#
-#          TF_VAR_cluster_username: ${{ secrets.AZURE_CLUSTER_USERNAME }}
-#          TF_VAR_cluster_password: ${{ secrets.AZURE_CLUSTER_PASSWORD }}
+      - name: Verify destroy on ${{ matrix.testcase }}
+        uses: cloud-native-toolkit/action-module-verify-destroy@main
+        if: ${{ never() }}
+        with:
+          clusterId: ${{ matrix.testcase }}
+        env:
+          TF_VAR_: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_ibmcloud_api_key: ${{ secrets.IBMCLOUD_API_KEY }}
+          IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
+
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+
+          TF_VAR_cluster_username: ${{ secrets.AZURE_CLUSTER_USERNAME }}
+          TF_VAR_cluster_password: ${{ secrets.AZURE_CLUSTER_PASSWORD }}
 
   verifyMetadata:
     runs-on: ubuntu-latest
