@@ -8,3 +8,4 @@ test/stages/terraform.tfstate
 test/stages/terraform.tfstate.backup
 test/stages/module
 test/stages/.terraform.lock.hcl
+/test/stages/terraform.tfvars

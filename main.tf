@@ -67,8 +67,8 @@ echo '${var.cluster_config_file}' > .kubeconfig
 export KUBECONFIG=${var.cluster_config_file}:$KUBECONFIG
 
 pwd
-chmod +x portworx-prereq.sh
-bash portworx-prereq.sh ${self.triggers.region} || { echo 'portworx-prereq.sh failed' ; exit 1; }
+chmod +x portworx-secret.sh
+bash portworx-secret.sh
 
 cat ${self.triggers.installer_workspace}/portworx_operator.yaml
 oc apply -f ${self.triggers.installer_workspace}/portworx_operator.yaml
