@@ -9,18 +9,10 @@ sleep 2m
 echo "checking for portworx services"
 
 
-count=0
-until oc get daemonset/portworx-api -n kube-system || [[ $count -eq 20 ]]; do
-  echo "Waiting for daemonset/portworx-api -n kube-system"
-  count=$((count + 1))
-  sleep 15
-done
 
-if [[ $count -eq 20 ]]; then
-  echo "Timed out waiting for daemonset/portworx-api -n kube-system"
-  exit 1
-fi
 
-oc rollout status daemonset/portworx-api -n kube-system
+oc rollout status deployment/portworx-operator -n kube-system
+STORAGECLUSTER=$(kubectl get storagecluster -n kube-system -o=jsonpath='{.items[].metadata.name}' )
+oc rollout status storagecluster/$STORAGECLUSTER
 
 exit 0
