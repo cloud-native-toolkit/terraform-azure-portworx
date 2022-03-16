@@ -48,7 +48,7 @@ jobs:
 
       - name: Verify destroy on ${{ matrix.testcase }}
         uses: cloud-native-toolkit/action-module-verify-destroy@main
-        if: ${{ never() }}
+        if: ${{ always() }}
         with:
           clusterId: ${{ matrix.testcase }}
         env:
