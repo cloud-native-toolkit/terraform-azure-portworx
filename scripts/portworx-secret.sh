@@ -11,9 +11,7 @@ if [ -z "$TENANT" ]; then
       echo "\$TENANT is required"
       exit 1
 fi
-TENANT=$(echo $CREDENTIALS | jq '.tenant')
-APP_ID=$(echo $CREDENTIALS | jq '.appId')
-PASS=$(echo $CREDENTIALS | jq '.password')
+
 
 echo "creating kube secret"
 kubectl delete secret generic -n kube-system px-azure --ignore-not-found=true
