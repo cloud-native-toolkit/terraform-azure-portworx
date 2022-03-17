@@ -15,7 +15,7 @@ spec:
   cloudStorage:
     deviceSpecs:
     - type=Premium_LRS,size=${var.disk_size}
-    kvdbDeviceSpec: type=gp2,size=${var.kvdb_disk_size}
+    kvdbDeviceSpec: type=Premium_LRS,size=${var.kvdb_disk_size}
     journalDeviceSpec: auto
   secretsProvider: ${local.secret_provider}
   stork:
@@ -289,7 +289,7 @@ volumeBindingMode: Immediate
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: portworx-shared-gp2
+  name: portworx-shared-premium-lrs
 parameters:
   priority_io: high
   repl: "2"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
@@ -359,7 +359,7 @@ volumeBindingMode: Immediate
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: portworx-nonshared-gp2
+  name: portworx-nonshared-premium-lrs
 parameters:
   priority_io: high
   repl: "2"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
