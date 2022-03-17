@@ -72,8 +72,9 @@ bash portworx-secret.sh
 
 cat ${self.triggers.installer_workspace}/portworx_operator.yaml
 oc apply -f ${self.triggers.installer_workspace}/portworx_operator.yaml
-echo "Sleeping for 5mins"
-sleep 300
+
+oc rollout status deployment.apps/portworx-operator -n kube-system
+
 echo "Deploying StorageCluster"
 oc apply -f ${self.triggers.installer_workspace}/portworx_storagecluster.yaml
 sleep 300
