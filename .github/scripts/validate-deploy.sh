@@ -11,6 +11,6 @@ echo "checking for portworx services"
 
 oc rollout status deployment/portworx-operator -n kube-system
 STORAGECLUSTER=$(kubectl get storagecluster -n kube-system -o=jsonpath='{.items[].metadata.name}' )
-oc rollout status storagecluster/$STORAGECLUSTER
+oc rollout status storagecluster/$STORAGECLUSTER -n kube-system
 
 exit 0
