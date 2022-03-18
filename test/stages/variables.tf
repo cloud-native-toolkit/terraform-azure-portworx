@@ -1,50 +1,63 @@
 
 # Resource Group Variables
-variable "resource_group_name" {
-  type        = string
-  description = "Existing resource group where the IKS cluster will be provisioned."
-}
-
-variable "ibmcloud_api_key" {
-  type        = string
-  description = "The api key for IBM Cloud access"
-}
 
 variable "region" {
   type        = string
-  description = "Region for VLANs defined in private_vlan_number and public_vlan_number."
+  description = "Region where AWS cluster is deployed"
 }
 
-variable "namespace" {
+variable "resource_group_name" {
   type        = string
-  description = "Namespace for tools"
+  description = "Resource group where AWS cluster is deployed"
 }
 
-variable "cluster_name" {
+variable "azure_subscription_id" {
+  type    = string
+  default = ""
+}
+
+variable "azure_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "azure_client_secret" {
+  type    = string
+  default = ""
+}
+
+variable "azure_tenant_id" {
+  type    = string
+  default = ""
+}
+
+variable cluster_name {
   type        = string
-  description = "The name of the cluster"
-  default     = ""
+  description = "The name of the ARO cluster"
 }
 
-variable "cluster_type" {
+variable cluster_username {
   type        = string
-  description = "The type of cluster that should be created (openshift or kubernetes)"
+  description = "The username for ARO cluster access"
 }
 
-variable "cluster_exists" {
+variable "cluster_password" {
   type        = string
-  description = "Flag indicating if the cluster already exists (true or false)"
-  default     = "true"
+  description = "The password for ARO cluster access"
 }
 
-variable "name_prefix" {
+variable "server_url" {
   type        = string
-  description = "Prefix name that should be used for the cluster and services. If not provided then resource_group_name will be used"
-  default     = ""
 }
 
-variable "vpc_cluster" {
-  type        = bool
-  description = "Flag indicating that this is a vpc cluster"
-  default     = false
+variable "px_cluster_id" {
+  type        = string
+}
+
+variable "px_user_id" {
+  type        = string
+}
+
+variable "px_osb_endpoint" {
+  type        = string
 }
