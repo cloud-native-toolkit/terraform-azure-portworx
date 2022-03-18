@@ -9,7 +9,7 @@ metadata:
     portworx.io/is-openshift: "true"
     portworx.io/is-aks: "true"
 spec:
-  image: portworx/oci-monitor:2.8.1.5
+  image: portworx/oci-monitor:2.9.1.3
   imagePullPolicy: Always
   kvdb:
     internal: true
