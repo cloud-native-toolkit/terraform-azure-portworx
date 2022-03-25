@@ -46,6 +46,12 @@ variable "cluster_password" {
   description = "The password for ARO cluster access"
 }
 
+
+variable "cluster_token" {
+  type        = string
+  description = "The token for ARO cluster access"
+}
+
 variable "server_url" {
   type        = string
 }
