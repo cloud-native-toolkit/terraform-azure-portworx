@@ -66,3 +66,13 @@ variable "portworx_type" {
   type        = string
   default     = "essentials"
 }
+
+variable "cluster_type" {
+  type        = string
+  description = "Type of OCP cluster on Azure (ARO | IPI)"
+  default     = "ARO"
+  validation {
+    condition     = contains(["ARO","IPI"], var.cluster_type)
+    error_message = "Allowed values for cluster_type are \"ARO\" or \"IPI\"."
+  }
+}

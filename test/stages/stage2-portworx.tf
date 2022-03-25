@@ -21,4 +21,5 @@ module "portworx" {
   cluster_config_file   = module.dev_cluster.platform.kubeconfig
   portworx_config       = local.portworx_config
   resource_group_name   = var.resource_group_name
+  cluster_type          = var.cluster_type
 }
