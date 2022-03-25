@@ -4,7 +4,7 @@ locals {
     cluster_id = var.px_cluster_id
     user_id = var.px_user_id
     osb_endpoint = var.px_osb_endpoint
-    type = "essentials"
+    type = var.portworx_type
     enable_encryption = false
   }
 }

@@ -5,7 +5,29 @@ tags:
   - tools
   - devops
 versions:
-  - platforms: []
-    dependencies: []
-    variables: []
+  - platforms:
+      - ocp4
+    providers:
+      - name: azure
+        source: "hashicorp/azurerm"
+    dependencies:
+      - id: cluster
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ocp-login.git
+            version: ">= 1.2.4"
+    variables:
+      - name: cluster_config_file
+        moduleRef:
+          id: cluster
+          output: config_file_path
+      - name: region
+        scope: global
+      - name: azure_client_id
+        scope: global
+      - name: azure_client_secret
+        scope: global
+      - name: azure_subscription_id
+        scope: global
+      - name: azure_tenant_id
+        scope: global
 cloudProvider: azure
