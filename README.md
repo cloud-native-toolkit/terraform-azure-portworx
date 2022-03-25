@@ -29,7 +29,7 @@ A service principal (service account) is used by the Portworx deployment to prov
   - `Microsoft.Compute/virtualMachineScaleSets/virtualMachines/write`
   - `Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read`
 
-Before attempting to deploy this module, you must be logged into the `az` cli, and manually run the `scripts/portworx-prereq.sh` script, which will handle both of these cases.  This script will output the credentials that are required to successfully deploy Portworx into the cluster. The output will be a JSON structure like: 
+Before attempting to deploy this module, you can log into the `az` cli, and manually run the `scripts/portworx-prereq.sh` script, which will handle both of these cases.  This script will output the credentials that are required to successfully deploy Portworx into the cluster. The output will be a JSON structure like: 
 
 ```
 {
@@ -39,6 +39,8 @@ Before attempting to deploy this module, you must be logged into the `az` cli, a
   "tenant": "XXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX", 
 }
 ```
+
+Or you can use use known credentials for an existing service principal to allow Portworx to provision volumes for the cluster.
 
 For Portworx deployment using this module:  
 - `appId` value should be used for the `azure_client_id` input variable
