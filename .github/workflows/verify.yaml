@@ -64,7 +64,6 @@ jobs:
 
           TF_VAR_cluster_username: ${{ secrets.AZURE_CLUSTER_USERNAME }}
           TF_VAR_cluster_password: ${{ secrets.AZURE_CLUSTER_PASSWORD }}
-          TF_VAR_cluster_token: ${{ secrets.AZURE_CLUSTER_TOKEN }}
 
   verifyMetadata:
     runs-on: ubuntu-latest
