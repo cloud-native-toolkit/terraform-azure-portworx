@@ -46,6 +46,12 @@ variable "cluster_password" {
   description = "The password for ARO cluster access"
 }
 
+
+variable "cluster_token" {
+  type        = string
+  description = "The token for ARO cluster access"
+}
+
 variable "server_url" {
   type        = string
 }
@@ -60,4 +66,19 @@ variable "px_user_id" {
 
 variable "px_osb_endpoint" {
   type        = string
+}
+
+variable "portworx_type" {
+  type        = string
+  default     = "essentials"
+}
+
+variable "cluster_type" {
+  type        = string
+  description = "Type of OCP cluster on Azure (ARO | IPI)"
+  default     = "ARO"
+  validation {
+    condition     = contains(["ARO","IPI"], var.cluster_type)
+    error_message = "Allowed values for cluster_type are \"ARO\" or \"IPI\"."
+  }
 }
