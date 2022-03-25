@@ -62,7 +62,7 @@ else
     }')
 
     echo "creating service principal portworx-$CLUSTER_NAME"
-    CREDENTIALS=$(az ad sp create-for-rbac --role=portworx-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
+    CREDENTIALS=$(az ad sp create-for-rbac --role=portworx-role-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
   fi
 
 fi
