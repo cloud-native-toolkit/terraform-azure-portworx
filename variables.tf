@@ -23,7 +23,7 @@ variable "azure_tenant_id" {
   default = ""
 }
 
-variable cluster_name {
+variable "cluster_name" {
   type        = string
   description = "The name of the ARO cluster"
 }
