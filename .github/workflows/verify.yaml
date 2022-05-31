@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         testcase:
-          - azure_latest_gitops
+          - azure_aro_latest_gitops
       fail-fast: false
 
     env:

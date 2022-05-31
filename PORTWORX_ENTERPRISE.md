@@ -16,4 +16,5 @@
 
 * Copy Spec URL and Paste in a browser:
 
-* Copy the Cluster ID highlighted in red. This will be the value for the `px_generated_cluster_id` variable.
+* From the yaml spec, copy the following values for use in Terraform execution. 
+  * `metadata.name` will be the value for the `portworx_config.px_generated_cluster_id` variable
