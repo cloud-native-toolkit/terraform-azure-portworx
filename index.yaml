@@ -35,6 +35,83 @@ versions:
         type: string
         default: ''
         scope: global
+      - name: cluster_name
+        type: string
+        description: The name of the ARO cluster
+      - name: region
+        type: string
+        description: Azure Region the cluster is deployed in
+        scope: global
+      - name: resource_group_name
+        type: string
+        description: Resource group where cluster is deployed
+      - name: portworx_config
+        type: |-
+          object({
+              type=string,
+              cluster_id=string,
+              enable_encryption=bool,
+              user_id=string,
+              osb_endpoint=string
+            })
+        description: Portworx configuration
+      - name: cluster_type
+        type: string
+        description: Type of OCP cluster on Azure (ARO | IPI)
+        default: ARO
+      - name: disk_size
+        description: Disk size for each Portworx volume
+        default: '1000'
+      - name: kvdb_disk_size
+        default: '150'
+      - name: px_enable_monitoring
+        type: bool
+        default: true
+        description: Enable monitoring on PX
+      - name: px_enable_csi
+        type: bool
+        default: true
+        description: Enable CSI on PX
+      - name: cluster_config_file
+        type: string
+        description: Cluster config file for Kubernetes cluster.
+        moduleRef:
+          id: cluster
+          output: config_file_path
+    version: v0.0.3
+    outputs:
+      - name: default_rwx_storage_class
+        description: Default read-write-many storage class
+  - platforms:
+      - ocp4
+    providers:
+      - name: azure
+        source: hashicorp/azurerm
+    dependencies:
+      - id: cluster
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ocp-login.git
+            version: '>= 1.2.4'
+    variables:
+      - name: provision
+        default: 'true'
+        description: If set to true installs Portworx on the given cluster
+      - name: azure_subscription_id
+        type: string
+        default: ''
+        scope: global
+      - name: azure_client_id
+        type: string
+        default: ''
+        scope: global
+      - name: azure_client_secret
+        type: string
+        default: ''
+        scope: global
+      - name: azure_tenant_id
+        type: string
+        default: ''
+        scope: global
       - name: variable cluster_name {
         type: string
         description: The name of the ARO cluster
