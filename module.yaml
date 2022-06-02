@@ -1,6 +1,7 @@
 name: azure-portworx
 type: terraform
 description: Module to provision portworx on azure
+cloudProvider: azure
 tags:
   - tools
   - devops
@@ -20,8 +21,6 @@ versions:
         moduleRef:
           id: cluster
           output: config_file_path
-      - name: region
-        scope: global
       - name: azure_client_id
         scope: global
       - name: azure_client_secret
@@ -30,4 +29,9 @@ versions:
         scope: global
       - name: azure_tenant_id
         scope: global
-cloudProvider: azure
+      - name: enable_encryption
+        important: true
+      - name: portworx_spec_file
+        important: true
+      - name: portworx_spec
+        important: true

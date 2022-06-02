@@ -1,13 +1,18 @@
+#!/usr/bin/env bash
 
-if [ -z "$CLIENT_ID" ]; then
+if [[ -n "${BIN_DIR}" ]]; then
+  export PATH="${BIN_DIR}:${PATH}"
+fi
+
+if [[ -z "$CLIENT_ID" ]]; then
       echo "\$CLIENT_ID is required"
       exit 1
 fi
-if [ -z "$CLIENT_SECRET" ]; then
+if [[ -z "$CLIENT_SECRET" ]]; then
       echo "\$CLIENT_SECRET is required"
       exit 1
 fi
-if [ -z "$TENANT" ]; then
+if [[ -z "$TENANT" ]]; then
       echo "\$TENANT is required"
       exit 1
 fi

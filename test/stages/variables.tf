@@ -6,11 +6,6 @@ variable "region" {
   description = "Region where AWS cluster is deployed"
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "Resource group where AWS cluster is deployed"
-}
-
 variable "azure_subscription_id" {
   type    = string
   default = ""
@@ -29,11 +24,6 @@ variable "azure_client_secret" {
 variable "azure_tenant_id" {
   type    = string
   default = ""
-}
-
-variable cluster_name {
-  type        = string
-  description = "The name of the ARO cluster"
 }
 
 variable cluster_username {
@@ -81,4 +71,12 @@ variable "cluster_type" {
     condition     = contains(["ARO","IPI"], var.cluster_type)
     error_message = "Allowed values for cluster_type are \"ARO\" or \"IPI\"."
   }
+}
+
+variable "portworx_spec" {
+  type = string
+}
+
+variable "ca_cert" {
+  type = string
 }
