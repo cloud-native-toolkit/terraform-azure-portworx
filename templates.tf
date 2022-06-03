@@ -60,8 +60,8 @@ metadata:
   name: px-essential
   namespace: kube-system
 data:
-  px-essen-user-id: ${var.portworx_config.user_id}
-  px-osb-endpoint: ${var.portworx_config.osb_endpoint}
+  px-essen-user-id: ${data.external.portworx_config.result.user_id}
+  px-osb-endpoint: ${data.external.portworx_config.result.osb_endpoint}
 %{endif}
 EOF
 }
@@ -181,7 +181,7 @@ metadata:
   name: portworx-shared-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "1"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "1"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   sharedv4: "true"
 allowVolumeExpansion: true
@@ -194,7 +194,7 @@ metadata:
   name: portworx-couchdb-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -208,7 +208,7 @@ metadata:
   name: portworx-elastic-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -222,7 +222,7 @@ metadata:
   name: portworx-solr-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -236,7 +236,7 @@ metadata:
   name: portworx-cassandra-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -250,7 +250,7 @@ metadata:
   name: portworx-kafka-sc
 provisioner: kubernetes.io/portworx-volume
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -264,7 +264,7 @@ metadata:
   name: portworx-metastoredb-sc
 parameters:
   priority_io: high
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -278,7 +278,7 @@ metadata:
   name: portworx-shared-gp
 parameters:
   priority_io: high
-  repl: "1"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "1"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "true"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -293,7 +293,7 @@ metadata:
   name: portworx-shared-premium-lrs
 parameters:
   priority_io: high
-  repl: "2"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "2"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "true"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -308,7 +308,7 @@ metadata:
   name: portworx-shared-gp3
 parameters:
   priority_io: high
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "true"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -322,7 +322,7 @@ kind: StorageClass
 metadata:
   name: portworx-db-gp
 parameters:
-  repl: "1"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "1"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -335,7 +335,7 @@ kind: StorageClass
 metadata:
   name: portworx-db-gp3
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -349,7 +349,7 @@ metadata:
   name: portworx-nonshared-gp
 parameters:
   priority_io: high
-  repl: "1"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "1"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -363,7 +363,7 @@ metadata:
   name: portworx-nonshared-premium-lrs
 parameters:
   priority_io: high
-  repl: "2"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "2"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -377,7 +377,7 @@ metadata:
   name: portworx-gp3-sc
 parameters:
   priority_io: high
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
 allowVolumeExpansion: true
@@ -392,7 +392,7 @@ metadata:
   name: portworx-shared-gp-allow
 parameters:
   priority_io: high
-  repl: "2"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "2"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "true"
   io_profile: "cms"
 provisioner: kubernetes.io/portworx-volume
@@ -406,7 +406,7 @@ metadata:
   name: portworx-db2-rwx-sc
 parameters:
   block_size: 4096b
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "true"
 provisioner: kubernetes.io/portworx-volume
 reclaimPolicy: Retain
@@ -419,7 +419,7 @@ metadata:
   name: portworx-db2-rwo-sc
 parameters:
   priority_io: high
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "false"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"
@@ -434,7 +434,7 @@ metadata:
   name: portworx-dv-shared-gp
 parameters:
   priority_io: high 
-  repl: "1"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "1"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   shared: "true"
 provisioner: kubernetes.io/portworx-volume
 reclaimPolicy: Retain
@@ -445,7 +445,7 @@ kind: StorageClass
 metadata:
   name: portworx-assistant
 parameters:
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   priority_io: "high"
   block_size: "64k"
   io_profile: "db_remote"
@@ -466,7 +466,7 @@ volumeBindingMode: Immediate
 parameters:
   block_size: 512b
   priority_io: high
-  repl: "3"%{if local.px_enterprise && var.portworx_config.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
+  repl: "3"%{if local.px_enterprise && var.enable_encryption}${indent(2, "\nsecure: \"true\"")}%{endif}
   sharedv4: "false"
   io_profile: "db_remote"
   disable_io_profile_protection: "1"

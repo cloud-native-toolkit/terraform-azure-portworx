@@ -3,6 +3,37 @@
 #  description = "Key used to encrypt Portworx PVCs"
 #}
 
+locals {
+  px_enterprise       = data.external.portworx_config.result.type == "enterprise"
+  rootpath            = abspath(path.root)
+  installer_workspace = "${local.rootpath}/installer-files"
+  px_cluster_id       = data.external.portworx_config.result.cluster_id
+  priv_image_registry = "image-registry.openshift-image-registry.svc:5000/kube-system"
+
+  #todo: fix for azure + aws
+  #secret_provider     = var.provision && local.px_enterprise && var.portworx_config.enable_encryption ? "aws-kms" : "k8s"
+  secret_provider     = "k8s"
+  px_workspace        = "${local.installer_workspace}/ibm-px"
+  portworx_spec       = var.portworx_spec_file != null && var.portworx_spec_file != "" ? base64encode(file(var.portworx_spec_file)) : var.portworx_spec
+}
+
+
+module setup_clis {
+  source = "cloud-native-toolkit/clis/util"
+  version = "1.16.0"
+
+  clis = ["kubectl", "oc", "yq4", "jq"]
+}
+
+data external portworx_config {
+  program = ["bash", "${path.module}/scripts/parse-portworx-config.sh"]
+
+  query = {
+    bin_dir = module.setup_clis.bin_dir
+    portworx_spec = local.portworx_spec
+  }
+}
+
 resource "null_resource" "create_workspace" {
   provisioner "local-exec" {
     command = <<EOF
@@ -38,49 +69,28 @@ resource "null_resource" "install_portworx" {
 
   triggers = {
     installer_workspace = local.installer_workspace
-    region              = var.region
     kubeconfig          = var.cluster_config_file
     px_cluster_id       = local.px_cluster_id
     SUBSCRIPTION_ID = base64encode(var.azure_subscription_id)
-    CLUSTER_NAME = var.cluster_name
-    RESOURCE_GROUP_NAME = var.resource_group_name
     CLIENT_ID = var.azure_client_id
     CLIENT_SECRET = base64encode(var.azure_client_secret)
     TENANT = var.azure_tenant_id
     CLUSTER_TYPE = var.cluster_type
+    BIN_DIR = module.setup_clis.bin_dir
   }
   provisioner "local-exec" {
-    working_dir = "${path.module}/scripts/"
     when        = create
     environment = {
       SUBSCRIPTION_ID = base64decode(self.triggers.SUBSCRIPTION_ID)
-      CLUSTER_NAME = self.triggers.CLUSTER_NAME
-      RESOURCE_GROUP_NAME = self.triggers.RESOURCE_GROUP_NAME
       CLIENT_ID = self.triggers.CLIENT_ID
       CLIENT_SECRET = base64decode(self.triggers.CLIENT_SECRET)
       TENANT = self.triggers.TENANT
       CLUSTER_TYPE = self.triggers.CLUSTER_TYPE
+      BIN_DIR = self.triggers.BIN_DIR
+      KUBECONFIG = self.triggers.kubeconfig
+      INSTALLER_WORKSPACE = self.triggers.installer_workspace
     }
-    command     = <<EOF
-
-echo '${var.cluster_config_file}' > .kubeconfig
-export KUBECONFIG=${var.cluster_config_file}:$KUBECONFIG
-
-pwd
-chmod +x portworx-secret.sh
-bash portworx-secret.sh
-
-cat ${self.triggers.installer_workspace}/portworx_operator.yaml
-oc apply -f ${self.triggers.installer_workspace}/portworx_operator.yaml
-
-oc rollout status deployment.apps/portworx-operator -n kube-system
-
-echo "Deploying StorageCluster"
-oc apply -f ${self.triggers.installer_workspace}/portworx_storagecluster.yaml
-sleep 300
-echo "Create storage classes"
-oc apply -f ${self.triggers.installer_workspace}/storage_classes.yaml
-EOF
+    command     = "${path.module}/scripts/install-portworx.sh"
   }
 
   provisioner "local-exec" {
@@ -89,79 +99,35 @@ EOF
     interpreter = ["/bin/bash", "-c"]
     environment = {
       SUBSCRIPTION_ID = base64decode(self.triggers.SUBSCRIPTION_ID)
-      CLUSTER_NAME = self.triggers.CLUSTER_NAME
-      RESOURCE_GROUP_NAME = self.triggers.RESOURCE_GROUP_NAME
       CLIENT_ID = self.triggers.CLIENT_ID
       CLIENT_SECRET = base64decode(self.triggers.CLIENT_SECRET)
       TENANT = self.triggers.TENANT
+      BIN_DIR = self.triggers.BIN_DIR
+      KUBECONFIG = self.triggers.kubeconfig
     }
-    command     = <<EOF
-echo '${self.triggers.kubeconfig}' > .kubeconfig
-export KUBECONFIG=${self.triggers.kubeconfig}:$KUBECONFIG
-
-#kubectl label daemonset/portworx-api name=portworx-api -
-#│ n kube-system
-#
-curl -fsL https://install.portworx.com/px-wipe | bash -s -- -f
-
-#todo: delete azure role definition, service principle
-
-kubectl delete storagecluster ${self.triggers.px_cluster_id} -n kube-system
-
-while kubectl get storagecluster ${self.triggers.px_cluster_id} -n kube-system; do
-  echo "waiting for storagecluster to destroy"
-  sleep 15s
-done
-echo "storagecluster destroyed"
-
-
-kubectl delete secret px-essential -n kube-system
-
-kubectl delete deployment portworx-operator -n kube-system
-kubectl delete ClusterRoleBinding portworx-operator -n kube-system
-kubectl delete ClusterRole portworx-operator -n kube-system
-kubectl delete PodSecurityPolicy portworx-operator -n kube-system
-kubectl delete ServiceAccount portworx-operator -n kube-system
-kubectl delete Secret px-azure -n kube-system
-
-kubectl get sc | grep portworx | awk '{print $1}' | while read -r SC; do
-  kubectl delete storageclass $SC
-done
-
-EOF
+    command     = "${path.module}/scripts/uninstall-portworx.sh ${self.triggers.px_cluster_id}"
   }
 }
 
 
 resource "null_resource" "enable_portworx_encryption" {
-  count = var.provision && local.px_enterprise && var.portworx_config.enable_encryption ? 1 : 0
+  count = var.provision && var.enable_encryption ? 1 : 0
   triggers = {
     installer_workspace = local.installer_workspace
-    region              = var.region
+    bin_dir = module.setup_clis.bin_dir
+    kubeconfig          = var.cluster_config_file
   }
   #todo: fix for both azure/aws
   provisioner "local-exec" {
     when    = create
-    command = <<EOF
-echo "Enabling encryption"
-PX_POD=$(oc get pods -l name=portworx -n kube-system -o jsonpath='{.items[0].metadata.name}')
-oc exec $PX_POD -n kube-system -- /opt/pwx/bin/pxctl secrets aws login
-EOF
+    command = "${path.module}/scripts/enable-encryption.sh '${local.px_enterprise}'"
+
+    environment = {
+      BIN_DIR = self.triggers.bin_dir
+      KUBECONFIG = self.triggers.kubeconfig
+    }
   }
   depends_on = [
     null_resource.install_portworx,
   ]
-}
-
-locals {
-  px_enterprise       = var.portworx_config.type == "enterprise"
-  rootpath            = abspath(path.root)
-  installer_workspace = "${local.rootpath}/installer-files"
-  px_cluster_id       = var.portworx_config.cluster_id
-  priv_image_registry = "image-registry.openshift-image-registry.svc:5000/kube-system"
-
-  #todo: fix for azure + aws
-  #secret_provider     = var.provision && local.px_enterprise && var.portworx_config.enable_encryption ? "aws-kms" : "k8s"
-  secret_provider     = "k8s"
-  px_workspace        = "${local.installer_workspace}/ibm-px"
 }

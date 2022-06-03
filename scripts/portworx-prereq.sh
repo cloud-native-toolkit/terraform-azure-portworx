@@ -2,45 +2,116 @@
 
 set -e
 
-if [ -z "$SUBSCRIPTION_ID" ]; then
-      echo "\$SUBSCRIPTION_ID is required"
-      exit 1
-fi
-if [ -z "$RESOURCE_GROUP_NAME" ]; then
-      echo "\$RESOURCE_GROUP_NAME is required"
-      exit 1
-fi
-if [ -z "$CLUSTER_NAME" ]; then
-      echo "\$CLUSTER_NAME is required"
-      exit 1
+
+Usage()
+{
+   echo "Retrieves the required credentials to install Portworx on Azure."
+   echo
+   echo "Usage: portworx-prereq.sh -t {cluster type} -r {resource group name} -c {cluster name} [-s {subscription id}]"
+   echo "  options:"
+   echo "  -t     Cluster type (ARO|IPI)"
+   echo "  -r     Resource group name for OpenShift cluster"
+   echo "  -c     Cluster name"
+   echo "  -s     (optional) Azure subscription id"
+   echo "  -h     Print this help"
+   echo
+}
+
+SUBSCRIPTION_ID=""
+RESOURCE_GROUP_NAME=""
+CLUSTER_NAME=""
+CLUSTER_TYPE=""
+
+# Get the options
+while getopts ":s:r:c:t:h:" option; do
+   case $option in
+      h) # display Help
+         Usage
+         exit 0;;
+      t)
+         CLUSTER_TYPE=$OPTARG;;
+      s)
+         SUBSCRIPTION_ID=$OPTARG;;
+      r) # Enter a name
+         RESOURCE_GROUP_NAME=$OPTARG;;
+      c) # Enter a name
+         CLUSTER_NAME=$OPTARG;;
+     \?) # Invalid option
+         echo "Error: Invalid option"
+         Usage
+         exit 1;;
+   esac
+done
+
+if ! command -v az 1> /dev/null 2> /dev/null; then
+  echo "az cli not found" >&2
+  exit 1
 fi
 
-echo "CLUSTER_NAME: $CLUSTER_NAME"
-echo "RESOURCE_GROUP_NAME: $RESOURCE_GROUP_NAME"
+if ! command -v jq 1> /dev/null 2> /dev/null; then
+  echo "jq cli not found" >&2
+  exit 1
+fi
+
+if [[ -z "${RESOURCE_GROUP_NAME}" ]] || [[ -z "${CLUSTER_NAME}" ]] || [[ -z "${CLUSTER_TYPE}" ]]; then
+  Usage
+  exit 1
+fi
+
+if ! az account list-locations 1> /dev/null 2> /dev/null; then
+  echo "Not logged into az cli" >&2
+  exit 1
+fi
+
+if [[ -z "${SUBSCRIPTION_ID}" ]]; then
+  az config set extension.use_dynamic_install=yes_without_prompt 1> /dev/null 2> /dev/null
+
+  SUBSCRIPTIONS=$(az account subscription list 2> /dev/null)
+
+  if [[ $(echo "${SUBSCRIPTIONS}" | jq '. | length') -eq 1 ]]; then
+    SUBSCRIPTION_ID=$(echo "${SUBSCRIPTIONS}" | jq -r '.[] | .subscriptionId')
+  elif [[ $(echo "${SUBSCRIPTIONS}" | jq '. | length') -gt 1 ]]; then
+    SUBSCRIPTION_IDS=$(echo "${SUBSCRIPTIONS}" | jq -r '.[] | .subscriptionId' | tr '\n' ' ')
+
+      PS3="Select the subscription id: "
+
+      select id in ${SUBSCRIPTION_IDS}; do
+        if [[ -n "${id}" ]]; then
+          SUBSCRIPTION_ID="${id}"
+          break
+        fi
+      done
+
+      echo ""
+  else
+    echo "Unable to find subscription id" >&2
+    exit 1
+  fi
+fi
 
 CREDENTIALS=""
 
-if [ "$CLUSTER_TYPE" = "ARO" ]; then
+if [[ "${CLUSTER_TYPE}" =~ ARO|aro ]]; then
   echo "Preparing Portworx for ARO cluster"
 
-  RESOURCE_GROUP_ID=$(az aro show --name $CLUSTER_NAME -g $RESOURCE_GROUP_NAME | jq -r '.clusterProfile.resourceGroupId')
-  RESOURCE_GROUP_ID=$(echo $RESOURCE_GROUP_ID | awk -F / '{print $NF}')
-  APP_ID=$(az ad sp list --display-name $RESOURCE_GROUP_ID | jq -r '.[].appId')
-  CREDENTIALS=$(az ad app credential reset --id $APP_ID --append)
+  RAW_RESOURCE_GROUP_ID=$(az aro show --name "${CLUSTER_NAME}" -g "${RESOURCE_GROUP_NAME}" 2> /dev/null | jq -r '.clusterProfile.resourceGroupId')
+  RESOURCE_GROUP_ID=$(echo "${RAW_RESOURCE_GROUP_ID}" | awk -F / '{print $NF}')
+  APP_ID=$(az ad sp list --display-name "${RESOURCE_GROUP_ID}" 2> /dev/null | jq -r '.[].appId')
+  CREDENTIALS=$(az ad app credential reset --id "${APP_ID}" --append 2> /dev/null)
 
 else
   echo "Preparing Portworx for IPI cluster"
 
-  ROLE_EXISTS=$(az role definition list -g $RESOURCE_GROUP_NAME -n "portworx-$CLUSTER_NAME")
+  ROLE_EXISTS=$(az role definition list -g "${RESOURCE_GROUP_NAME}" -n "portworx-${CLUSTER_NAME}" 2> /dev/null)
   if [[ ${#ROLE_EXISTS} -gt 2 ]] ; then
     echo "Role portworx-$CLUSTER_NAME already exists"
   else
     echo "creating role portworx-$CLUSTER_NAME"
     ROLE=$(az role definition create --role-definition '{
-            "Name": "portworx-role-'$CLUSTER_NAME'",
+            "Name": "portworx-role-'${CLUSTER_NAME}'",
             "Description": "",
             "AssignableScopes": [
-                "/subscriptions/'$SUBSCRIPTION_ID'"
+                "/subscriptions/'${SUBSCRIPTION_ID}'"
             ],
             "Permissions": [
                 {
@@ -59,20 +130,17 @@ else
                     "NotDataActions": []
                 }
             ]
-    }')
+    }' 2> /dev/null)
 
-    echo "creating service principal portworx-$CLUSTER_NAME"
-    CREDENTIALS=$(az ad sp create-for-rbac --role=portworx-role-$CLUSTER_NAME --scopes="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME")
+    echo "creating service principal portworx-${CLUSTER_NAME}"
+    CREDENTIALS=$(az ad sp create-for-rbac --role="portworx-role-${CLUSTER_NAME}" --scopes="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}" 2> /dev/null)
   fi
-
 fi
 
-
-
-
-if [ -z "CREDENTIALS" ]; then
-      echo "\$CREDENTIALS were empty"
-      exit 1
+if [[ -z "${CREDENTIALS}" ]]; then
+  echo "CREDENTIALS are empty"
+  exit 1
 fi
 
-echo $CREDENTIALS
+echo "${CREDENTIALS}" | jq --arg SUBSCRIPTION_ID "${SUBSCRIPTION_ID}" \
+  '{"azure_client_id": .appId, "azure_client_secret": .password, "azure_tenant_id": .tenant, "azure_subscription_id": $SUBSCRIPTION_ID}'

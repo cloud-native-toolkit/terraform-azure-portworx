@@ -2,6 +2,9 @@
 
 set -e
 
+BIN_DIR=$(cat .bin_dir)
+export PATH="${BIN_DIR}:${PATH}"
+
 export KUBECONFIG=$(cat .kubeconfig)
 echo "sleeping to prevent synchronization errors"
 sleep 3m
