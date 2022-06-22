@@ -28,7 +28,7 @@ SECRET_NAME=$(echo "${PORTWORX_CONFIG}" | yq4 'select(documentIndex == 1) | .met
 USER_ID=$(echo "${PORTWORX_CONFIG}" | yq4 'select(documentIndex == 1) | .data.px-essen-user-id')
 OSB_ENDPOINT=$(echo "${PORTWORX_CONFIG}" | yq4 'select(documentIndex == 1) | .data.px-osb-endpoint')
 
-if [[ "${SECRET_NAME}" == "px-essentials" ]]; then
+if [[ "${SECRET_NAME}" =~ "essential" ]]; then
   TYPE="essentials"
 else
   TYPE="enterprise"
