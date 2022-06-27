@@ -92,6 +92,16 @@ This module makes use of the output from other modules:
 Note: `osb_endpoint` and `user_id` are only required in `portworx_config` if `type` is `essentials`.  These values are not required for type `enterprise`. 
 
 ```hcl-terraform
+module "cluster-login" {
+  source = "github.com/cloud-native-toolkit/terraform-ocp-login.git"
+
+  server_url = var.server_url
+  login_user = var.cluster_username
+  login_password = var.cluster_password
+  login_token = ""
+  ca_cert = var.ca_cert  
+}
+
 module "azure-portworx" {
   source = "./module"
 
