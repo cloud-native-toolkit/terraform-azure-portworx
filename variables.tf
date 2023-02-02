@@ -78,3 +78,27 @@ variable "enable_encryption" {
   description = "Flag indicating portworx volumes should be encrypted"
   default = false
 }
+
+variable "default_rwx_storage_class" {
+  type        = string
+  description = "The default storage class that should be used for RWX volumes"
+  default     = "portworx-rwx-gp3-sc"
+}
+
+variable "default_rwo_storage_class" {
+  type        = string
+  description = "The default storage class that should be used for RWO volumes"
+  default     = "portworx-gp3-sc"
+}
+
+variable "default_file_storage_class" {
+  type        = string
+  description = "The default storage class that should be used for file volumes"
+  default     = "portworx-gp3-sc"
+}
+
+variable "default_block_storage_class" {
+  type        = string
+  description = "The default storage class that should be used for block volumes"
+  default     = "managed-premium"
+}
