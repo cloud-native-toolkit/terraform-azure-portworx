@@ -13,6 +13,8 @@ versions:
     providers:
       - name: azure
         source: "hashicorp/azurerm"
+      - name: clis
+        source: cloud-native-toolkit/clis
     dependencies:
       - id: cluster
         refs:

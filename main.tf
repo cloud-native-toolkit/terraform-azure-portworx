@@ -17,18 +17,15 @@ locals {
   portworx_spec       = var.portworx_spec_file != null && var.portworx_spec_file != "" ? base64encode(file(var.portworx_spec_file)) : var.portworx_spec
 }
 
-
-module setup_clis {
-  source = "cloud-native-toolkit/clis/util"
-
-  clis = ["kubectl", "oc", "yq4", "jq"]
+data clis_check clis {
+  clis = ["kubectl", "oc", "yq", "jq"]
 }
 
 data external portworx_config {
   program = ["bash", "${path.module}/scripts/parse-portworx-config.sh"]
 
   query = {
-    bin_dir = module.setup_clis.bin_dir
+    bin_dir = data.clis_check.clis.bin_dir
     portworx_spec = local.portworx_spec
   }
 }
@@ -56,7 +53,6 @@ resource "local_file" "portworx_storagecluster_yaml" {
   filename = "${local.installer_workspace}/portworx_storagecluster.yaml"
 }
 
-
 resource "null_resource" "install_portworx" {
   count = var.provision ? 1 : 0
 
@@ -75,7 +71,7 @@ resource "null_resource" "install_portworx" {
     CLIENT_SECRET = base64encode(var.azure_client_secret)
     TENANT = var.azure_tenant_id
     CLUSTER_TYPE = var.cluster_type
-    BIN_DIR = module.setup_clis.bin_dir
+    BIN_DIR = data.clis_check.clis.bin_dir
   }
   provisioner "local-exec" {
     when        = create
@@ -113,7 +109,7 @@ resource "null_resource" "enable_portworx_encryption" {
   count = var.provision && var.enable_encryption ? 1 : 0
   triggers = {
     installer_workspace = local.installer_workspace
-    bin_dir = module.setup_clis.bin_dir
+    bin_dir = data.clis_check.clis.bin_dir
     kubeconfig          = var.cluster_config_file
   }
   #todo: fix for both azure/aws
