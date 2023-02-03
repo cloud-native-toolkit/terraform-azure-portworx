@@ -1,4 +1,6 @@
 name: azure-portworx
+interfaces:
+  - github.com/cloud-native-toolkit/automation-modules#cluster-storage
 type: terraform
 description: Module to provision portworx on azure
 cloudProvider: azure
