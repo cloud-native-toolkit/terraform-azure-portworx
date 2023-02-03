@@ -13,5 +13,8 @@ terraform {
     template = {
       source = "hashicorp/template"
     }
+    clis = {
+      source  = "cloud-native-toolkit/clis"
+    }
   }
 }

@@ -1,15 +1,37 @@
 terraform {
+  required_providers {
+    azurerm = {
+      source = "hashicorp/azurerm"
+    }
+    local = {
+      source = "hashicorp/local"
+    }
+    null = {
+      source = "hashicorp/null"
+    }
+    template = {
+      source = "hashicorp/template"
+    }
+    clis = {
+      source  = "cloud-native-toolkit/clis"
+    }
+  }
 }
 
-module setup_clis {
-  source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
+provider "clis" {
+  alias = "clis1"
 
-  bin_dir = "${path.cwd}/test_bin_dir"
-  clis = ["jq", "oc", "kubectl"]
+  bin_dir = ".bin3"
+}
+
+data clis_check clis1 {
+  provider = clis.clis1
+
+  clis = ["jq", "kubectl", "oc"]
 }
 
 resource local_file bin_dir {
   filename = "${path.cwd}/.bin_dir"
 
-  content = module.setup_clis.bin_dir
+  content = data.clis_check.clis1.bin_dir
 }
